@@ -1,0 +1,131 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/05/CPU.hdl
+
+/**
+ * The Hack CPU (Central Processing unit), consisting of an ALU,
+ * two registers named A and D, and a program counter named PC.
+ * The CPU is designed to fetch and execute instructions written in 
+ * the Hack machine language. In particular, functions as follows:
+ * Executes the inputted instruction according to the Hack machine 
+ * language specification. The D and A in the language specification
+ * refer to CPU-resident registers, while M refers to the external
+ * memory location addressed by A, i.e. to Memory[A]. The inM input 
+ * holds the value of this location. If the current instruction needs 
+ * to write a value to M, the value is placed in outM, the address 
+ * of the target location is placed in the addressM output, and the 
+ * writeM control bit is asserted. (When writeM==0, any value may 
+ * appear in outM). The outM and writeM outputs are combinational: 
+ * they are affected instantaneously by the execution of the current 
+ * instruction. The addressM and pc outputs are clocked: although they 
+ * are affected by the execution of the current instruction, they commit 
+ * to their new values only in the next time step. If reset==1 then the 
+ * CPU jumps to address 0 (i.e. pc is set to 0 in next time step) rather 
+ * than to the address resulting from executing the current instruction. 
+ */
+
+CHIP CPU {
+
+    IN  inM[16],         // M value input  (M = contents of RAM[A])
+        instruction[16], // Instruction for execution
+        reset;           // Signals whether to re-start the current
+                         // program (reset==1) or continue executing
+                         // the current program (reset==0).
+
+    OUT outM[16],        // M value output
+        writeM,          // Write to M? 
+        addressM[15],    // Address in data memory (of M)
+        pc[15];          // address of next instruction
+
+    // 仕様メモ：
+    // A命令(68ページ)=Aレジスタに15ビットの値を設定する。
+    // (0vvv vvvv vvvv vvvv)
+    // C命令(69ページ)=何を計算するか、どこに結果を格納するか、次に何するかを決める
+    // (111a cccc ccdd djjj)
+    PARTS:
+    // Put your code here:
+
+    // 下記２パターンのとき、Aレジスタに値を登録する。
+    // instructionがA命令の時
+    // instructionがC命令で、d1ビット(instruction[5])が1の時
+
+    // 15ビット目を見て、A命令の場合はAレジスタに格納する
+    Mux16 (a=instruction, b=ALUOut, sel=instruction[15], out=aIn);
+
+    // C命令の時、d1ビット(instruction[5])が1の時はAレジスタに登録する
+    Not (in=instruction[15], out=AInCmd);
+    Or (a=AInCmd, b=instruction[5], out=aLoad);
+
+    ARegister (in=aIn, load=aLoad, out=A, out[0..14]=addressM);
+
+    // ALUへの入力、AレジスタかinMかを決める
+    // instructionがC命令で、aビット(instruction[12])が1ならM(inM)、0ならAの値を使用
+    And (a=instruction[15], b=instruction[12], out=AorM);
+    Mux16 (a=A, b=inM, sel=AorM, out=AM);
+
+    // Dレジスタの操作。instructionがC命令、かつ、d2ビットが1(instruction[4])の時、保存する
+    And (a=instruction[15], b=instruction[4], out=dLoad);
+    DRegister (in=ALUOut, load=dLoad, out=D);
+
+    // ALU
+    // 入力はDレジスタと、(Aレジスタかメモリ)。
+    // instructionのcビットによってどの関数を実行するかが決まる
+    ALU (
+        // 入力
+        x=D,
+        y=AM,
+
+        // 入力(命令)
+        zx=instruction[11],
+        nx=instruction[10],
+        zy=instruction[9],
+        ny=instruction[8],
+        f=instruction[7],
+        no=instruction[6],
+        
+        // 出力。CPU内部で使うものと、外部に出力するもの2つ必要
+        out=ALUOut,
+        out=outM,
+
+        zr=zr, // if out=0 then zr = 1 else zr = 0
+        ng=ng  // if out<0 then ng = 1 else ng = 0
+    );
+
+    // writeM(Memoryに書き込むかどうか)への出力。
+    // instructionがC命令で、かつd3ビット(instruction[3])が1の時、Memoryに出力。
+    And (a=instruction[15], b=instruction[3], out=writeM);
+
+    // instructionがC命令だった場合の、jump領域(jビット)の判定
+    // jビットの仕様はページ73にある。
+    // j1(instruction[2])の判定。C命令かつj1=1の時、out<0かどうかを見る
+    // ngはALUから出力される、out<0の時、1を出力するやつ
+    And (a=instruction[15], b=instruction[2], out=lt);
+    And (a=lt, b=ng, out=jresult1);
+
+    // j2(instruction[1])の判定。C命令かつj2=1の時、out=0かどうかを見る
+    // zrはALUから出力される、out=0の時、1を出力するやつ
+    And (a=instruction[15], b=instruction[1], out=eq);
+    And (a=eq, b=zr, out=jresult2);
+
+
+    // j3(instruction[0])の判定。C命令かつj3=1の時、out>0かどうかを見る
+    // ngやzrはout<0やout=0を見ているので、out>0を見るためどちらもNotしてみる
+    Not (in=ng, out=nng);
+    Not (in=zr, out=nzr);
+    And (a=nng, b=nzr, out=nngnzr);
+    And (a=instruction[15], b=instruction[0], out=gt);
+    And (a=gt, b=nngnzr, out=jresult3);
+
+    // jビットの判定しPC回路に何をするかを決める。A命令の時はpcInc=1
+    // jビットが全て0の場合もpcInc=1
+    // どれか成立していたらpcLoad=1
+    Or (a=jresult1, b=jresult2, out=tmpLoad);
+    Or (a=jresult3, b=tmpLoad, out=pcload);
+
+    // PC用のincを作成
+    Not (in=pcload, out=pcinc);
+
+    // PC (プログラムカウンタ)
+    PC (in=A, load=pcload, inc=pcinc, reset=reset, out[0..14]=pc);
+}
