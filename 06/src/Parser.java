@@ -1,14 +1,17 @@
 import java.util.ArrayList;
+import java.util.List;
 
 public class Parser {
-    private List commandList = new ArrayList<>();
-    public Parser(String filePath) {
+    private List<E> commandList = new ArrayList<>();
+    private int currentCommandNum;
 
+    public Parser(String filePath) {
+        currentCommandNum = 0;
     }
 
     private void parseCommandList(String filePath) {
         Path path = Path.of(filePath);
-        
+
         try (Stream<String> stream = Files.lines(path)) {
             stream.forEach(line -> addCommand(line));
         }
@@ -16,12 +19,12 @@ public class Parser {
 
     private void addCommand(String line) {
         String[] words = line.split("\\s");
-        
+
         // 実際にファイルを1行ずつparseしていく
         StringBuilder command = new StringBuilder();
-        for (String word: words) {
+        for (String word : words) {
             // 空だった場合
-            if(word.isEmpty()) {
+            if (word.isEmpty()) {
                 break;
             }
 
@@ -32,8 +35,71 @@ public class Parser {
             command.append(word);
         }
 
-        if(!command.isEmpty()) {
+        if (!command.isEmpty()) {
             commandList.add(command.toString());
+        }
+    }
+
+    /**
+     * まだコマンドがあるかどうかを返す。(書籍指定メソッド)
+     * 
+     * @return
+     */
+    public boolean hasMoreCommands() {
+        return currentCommandNum < commandList.size() - 1;
+    }
+
+    /**
+     * 次のコマンドを現在のコマンドにする。(書籍指定メソッド)
+     */
+    public void advance() {
+        if (hasMoreCommands()) {
+            currentCommandNum++;
+        }
+    }
+
+
+    /**
+     * 現在のコマンドの種類を返す。(書籍指定メソッド)
+     * @return
+     */
+    public String commandType() {
+        String crrCmd = commandList.get(currentCommandNum);
+
+        if(crrCmd.charAt(0) == '@') {
+            return "A_COMMAND";
+        }
+
+        if(crrCmd.contains("=") || crrCmd.contains(";")) {
+            return "C_COMMAND";
+        }
+
+        if(crrCmd.charAt(0) == '(' && crrCmd.charAt(crrCmd.length() - 1) == ')') {
+            return "L_COMMAND";
+        }
+        
+        return "invalid command";
+    }
+
+    /**
+     * 現コマンドのsymbolを返す。(書籍指定メソッド)
+     * @return
+     */
+    public String symbol() {
+        String crrCmd = commandList.get(currentCommandNum);
+
+        String cmdType = commandType();
+
+        if(cmdType.equals("C_COMMAND")) {
+            return "invalid call";
+        }
+
+        if(cmdType.equals("A_COMMAND")) {
+            return crrCmd.substring(1);
+        }
+
+        if(cmdType.equals("L_COMMAND")) {
+            return crrCmd.substring(1, crrCmd.length() - 1);
         }
     }
 }
