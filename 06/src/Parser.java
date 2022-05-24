@@ -7,6 +7,7 @@ public class Parser {
 
     public Parser(String filePath) {
         currentCommandNum = 0;
+        parseCommandList(filePath);
     }
 
     private void parseCommandList(String filePath) {
@@ -58,31 +59,32 @@ public class Parser {
         }
     }
 
-
     /**
      * 現在のコマンドの種類を返す。(書籍指定メソッド)
+     * 
      * @return
      */
     public String commandType() {
         String crrCmd = commandList.get(currentCommandNum);
 
-        if(crrCmd.charAt(0) == '@') {
+        if (crrCmd.charAt(0) == '@') {
             return "A_COMMAND";
         }
 
-        if(crrCmd.contains("=") || crrCmd.contains(";")) {
+        if (crrCmd.contains("=") || crrCmd.contains(";")) {
             return "C_COMMAND";
         }
 
-        if(crrCmd.charAt(0) == '(' && crrCmd.charAt(crrCmd.length() - 1) == ')') {
+        if (crrCmd.charAt(0) == '(' && crrCmd.charAt(crrCmd.length() - 1) == ')') {
             return "L_COMMAND";
         }
-        
+
         return "invalid command";
     }
 
     /**
      * 現コマンドのsymbolを返す。(書籍指定メソッド)
+     * 
      * @return
      */
     public String symbol() {
@@ -90,16 +92,78 @@ public class Parser {
 
         String cmdType = commandType();
 
-        if(cmdType.equals("C_COMMAND")) {
+        if (cmdType.equals("C_COMMAND")) {
             return "invalid call";
         }
 
-        if(cmdType.equals("A_COMMAND")) {
+        if (cmdType.equals("A_COMMAND")) {
             return crrCmd.substring(1);
         }
 
-        if(cmdType.equals("L_COMMAND")) {
+        if (cmdType.equals("L_COMMAND")) {
             return crrCmd.substring(1, crrCmd.length() - 1);
         }
+    }
+
+    /**
+     * C命令のdestニーモニックを返す。(書籍指定メソッド)
+     * 
+     * @return
+     */
+    public String dest() {
+        if (!cmdType().equals("C_COMMAND")) {
+            return "invalid call";
+        }
+
+        String crrCmd = commandList.get(currentCommandNum);
+        int equalIndex = crrCmd.indexOf("=");
+
+        if (equalIndex >= 0) {
+            return crrCmd.substring(0, equalIndex);
+        }
+        return null;
+    }
+
+    /**
+     * C命令のcompニーモニックを返す。(書籍指定メソッド)
+     * 
+     * @return
+     */
+    public String comp() {
+        if (!cmdType().equals("C_COMMAND")) {
+            return "invalid call";
+        }
+
+        String crrCmd = commandList.get(currentCommandNum);
+        int equalIndex = crrCmd.indexOf("=");
+        int semiIndex = crrCmd.indexOf(";");
+
+        if (equalIndex >= 0) {
+            return crrCmd.substring(equalIndex + 1, crrCmd.length());
+        }
+
+        if (semiIndex >= 0) {
+            return crrCmd.substring(0, semiIndex);
+        }
+        return null;
+    }
+
+    /**
+     * C命令のjumpニーモニックを返す。(書籍指定メソッド)
+     * 
+     * @return
+     */
+    public String jump() {
+        if (!cmdType().equals("C_COMMAND")) {
+            return "invalid call";
+        }
+
+        String crrCmd = commandList.get(currentCommandNum);
+        int semiIndex = crrCmd.indexOf(";");
+
+        if (semiIndex >= 0) {
+            return crrCmd.substring(semiIndex + 1, crrCmd.length());
+        }
+        return null;
     }
 }
