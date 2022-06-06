@@ -1,16 +1,20 @@
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class Parser {
-    private List<E> commandList = new ArrayList<>();
+    private List<String> commandList = new ArrayList<>();
     private int currentCommandNum;
 
-    public Parser(String filePath) {
+    public Parser(String filePath) throws IOException {
         currentCommandNum = 0;
         parseCommandList(filePath);
     }
 
-    private void parseCommandList(String filePath) {
+    private void parseCommandList(String filePath) throws IOException {
         Path path = Path.of(filePath);
 
         try (Stream<String> stream = Files.lines(path)) {
@@ -30,7 +34,7 @@ public class Parser {
             }
 
             // コメントだった時は無視する
-            if (word.length >= 2 && word.substring(0, 2).equals("//")) {
+            if (word.length() >= 2 && word.substring(0, 2).equals("//")) {
                 break;
             }
             command.append(word);
@@ -103,6 +107,7 @@ public class Parser {
         if (cmdType.equals("L_COMMAND")) {
             return crrCmd.substring(1, crrCmd.length() - 1);
         }
+        return "invalid call";
     }
 
     /**
@@ -111,7 +116,7 @@ public class Parser {
      * @return
      */
     public String dest() {
-        if (!cmdType().equals("C_COMMAND")) {
+        if (!commandType().equals("C_COMMAND")) {
             return "invalid call";
         }
 
@@ -130,7 +135,7 @@ public class Parser {
      * @return
      */
     public String comp() {
-        if (!cmdType().equals("C_COMMAND")) {
+        if (!commandType().equals("C_COMMAND")) {
             return "invalid call";
         }
 
@@ -154,7 +159,7 @@ public class Parser {
      * @return
      */
     public String jump() {
-        if (!cmdType().equals("C_COMMAND")) {
+        if (!commandType().equals("C_COMMAND")) {
             return "invalid call";
         }
 
