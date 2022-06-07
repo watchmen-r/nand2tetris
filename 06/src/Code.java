@@ -1,5 +1,6 @@
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class Code {
     Map<String, String> compMap = new HashMap<>();
@@ -55,8 +56,28 @@ public class Code {
         jumpMap.put("JLE", "110");
         jumpMap.put("JMP", "111");
     }
-    
-    public String dest() {
 
+    public String comp(String mnemonic) {
+        String key = mnemonic;
+        if(mnemonic == null) {
+            key = mnemonic;
+        }
+        return compMap.get(key);
+    }
+    
+    public String dest(String mnemonic) {
+        String key = mnemonic;
+        if(mnemonic == null) {
+            key = mnemonic;
+        }
+        return destMap.get(key);
+    }
+
+    public String jump(String mnemonic) {
+        String key = mnemonic;
+        if(mnemonic == null) {
+            key = mnemonic;
+        }
+        return jumpMap.get(key);
     }
 }
