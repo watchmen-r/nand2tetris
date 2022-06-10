@@ -18,4 +18,15 @@ public class SymbolTable {
         symbolMap.put("KBD", 24576);
     }
 
+    public void addEntry(String symbol, int address) {
+        symbolMap.put(symbol, address);
+    }
+
+    public boolean contains(String symbol) {
+        return symbolMap.containsKey(symbol);
+    }
+
+    public int getAddress(String symbol) {
+        return symbolMap.get(symbol);
+    }
 }
