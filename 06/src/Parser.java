@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 public class Parser {
+    // コマンドのリストと、現在のコマンドの場所を持っておく
     private List<String> commandList = new ArrayList<>();
     private int currentCommandNum;
 
@@ -100,6 +101,7 @@ public class Parser {
             return "invalid call";
         }
 
+        // Aコマンド(@Xxx)のXxxを返す。Xxxはシンボルか
         if (cmdType.equals("A_COMMAND")) {
             return crrCmd.substring(1);
         }
