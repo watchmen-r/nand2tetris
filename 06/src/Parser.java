@@ -17,7 +17,7 @@ public class Parser {
 
     private void parseCommandList(String filePath) throws IOException {
         Path path = Path.of(filePath);
-
+ 
         try (Stream<String> stream = Files.lines(path)) {
             stream.forEach(line -> addCommand(line));
         }

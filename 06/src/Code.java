@@ -60,7 +60,7 @@ public class Code {
     public String comp(String mnemonic) {
         String key = mnemonic;
         if(mnemonic == null) {
-            key = mnemonic;
+            key = "NULL";
         }
         return compMap.get(key);
     }
@@ -68,7 +68,7 @@ public class Code {
     public String dest(String mnemonic) {
         String key = mnemonic;
         if(mnemonic == null) {
-            key = mnemonic;
+            key = "NULL";
         }
         return destMap.get(key);
     }
@@ -76,7 +76,7 @@ public class Code {
     public String jump(String mnemonic) {
         String key = mnemonic;
         if(mnemonic == null) {
-            key = mnemonic;
+            key = "NULL";
         }
         return jumpMap.get(key);
     }

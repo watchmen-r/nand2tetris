@@ -33,25 +33,45 @@ public class Assembler {
             // Aコマンド(@Xxxのもの)の場合
             if (parser.commandType().equals("A_COMMAND")) {
                 String machineLanguage = "0";
-                
+                String binary = "";
+
                 // Aコマンドの@XxxのXxxが10進数整数の場合
                 if (parser.symbol().matches(NUM_REG)) {
+                    int deciNum = Integer.parseInt(parser.symbol());
+                    binary = Integer.toBinaryString(deciNum);
                     
-                } else {
                     // @XxxのXxxがシンボルの場合
-                    if (symbolTable.contains(parser.symbol())) {
-                        String binary = Integer.toBinaryString((symbolTable.getAddress((parser.symbol()))));
-                        String paddingBinary = String.format("%15s", binary).replace(" ", "0");
-                        machineLanguage += binary;
+                } else {
+
+                    if (!symbolTable.contains(parser.symbol())) {
+                        symbolTable.addEntry(parser.symbol());
                     }
+
+                    binary = Integer.toBinaryString((symbolTable.getAddress((parser.symbol()))));
                 }
-
-
+                String paddingBinary = String.format("%15s", binary).replace(" ", "0");
+                machineLanguage += paddingBinary;
+                writeOut.println(machineLanguage);
 
             }
-
             // Cコマンドの場合
-        }
+            if (parser.commandType().equals("C_COMMAND")) {
+                // C命令の機械語の最初3桁は111
+                StringBuilder mlBuilder = new StringBuilder("111");
+                mlBuilder.append(code.comp(parser.comp()));
+                mlBuilder.append(code.dest(parser.dest()));
+                mlBuilder.append(code.jump(parser.jump()));
 
+                String machineLanguage = mlBuilder.toString();
+                writeOut.println(machineLanguage);
+            }
+
+            if (parser.hasMoreCommands()) {
+                parser.advance();
+            } else {
+                break;
+            }
+        }
+        writeOut.close();
     }
 }

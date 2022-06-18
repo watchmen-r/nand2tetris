@@ -3,6 +3,9 @@ import java.util.Map;
 
 public class SymbolTable {
     private Map<String, Integer> symbolMap = new HashMap<>();
+
+    private int nextMemAddress;
+    private int currentLine;
     
     public SymbolTable() {
         // 定義済のシンボルを設定する
@@ -16,10 +19,14 @@ public class SymbolTable {
         }
         symbolMap.put("SCREEN", 16384);
         symbolMap.put("KBD", 24576);
+
+        nextMemAddress = 16;
+        currentLine = 0;
     }
 
-    public void addEntry(String symbol, int address) {
-        symbolMap.put(symbol, address);
+    public void addEntry(String symbol) {
+        symbolMap.put(symbol, nextMemAddress);
+        nextMemAddress++;
     }
 
     public boolean contains(String symbol) {
