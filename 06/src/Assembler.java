@@ -18,7 +18,7 @@ public class Assembler {
 
         Parser parser = new Parser(inputFile.toPath().toString());
         Code code = new Code();
-        SymbolTable symbolTable = new SymbolTable();
+        SymbolTable symbolTable = new SymbolTable(parser);
 
         while (true) {
             // ラベル系の場合
