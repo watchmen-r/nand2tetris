@@ -24,16 +24,11 @@ public class Parser {
     }
 
     private void addCommand(String line) {
-        String[] words = line.split("\\s");
+        String[] words = line.trim().split("\\s");
 
         // 実際にファイルを1行ずつparseしていく
         StringBuilder command = new StringBuilder();
         for (String word : words) {
-            // 空だった場合
-            if (word.isEmpty()) {
-                break;
-            }
-
             // コメントだった時は無視する
             if (word.length() >= 2 && word.substring(0, 2).equals("//")) {
                 break;
@@ -44,6 +39,10 @@ public class Parser {
         if (!command.isEmpty()) {
             commandList.add(command.toString());
         }
+    }
+
+    public void reset() {
+        currentCommandNum = 0;
     }
 
     /**

@@ -6,8 +6,9 @@ public class SymbolTable {
 
     private int nextMemAddress;
     private int currentLine;
+    private Parser parser;
     
-    public SymbolTable() {
+    public SymbolTable(Parser p) {
         // 定義済のシンボルを設定する
         symbolMap.put("SP", 0);
         symbolMap.put("LCL", 1);
@@ -22,6 +23,25 @@ public class SymbolTable {
 
         nextMemAddress = 16;
         currentLine = 0;
+        parser = p;
+        saveOriginSymbol();
+    }
+
+    private void saveOriginSymbol() {
+        while(true) {
+            if(parser.commandType().equals("L_COMMAND")) {
+                symbolMap.put(parser.symbol(), currentLine);
+            } else {
+                currentLine++;
+            }
+
+            if(parser.hasMoreCommands()) {
+                parser.advance();
+                continue;
+            }
+            break;
+        }
+        parser.reset();
     }
 
     public void addEntry(String symbol) {
