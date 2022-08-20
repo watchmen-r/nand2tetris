@@ -122,4 +122,36 @@ public class Parser {
 
         throw new IllegalArgumentException("Unknown command.");
     }
+
+    /**
+     * return first argument.
+     * 
+     * @return
+     */
+    public String arg1() {
+        String currentCmd = commandList.get(currentCommandNum);
+
+        if (commandType().equals("C_RETURN")) {
+            throw new IllegalCallerException("Illegal call");
+        }
+
+        if (commandType().equals("C_ARITHMEETIC")) {
+            return currentCmd;
+        }
+
+        return currentCmd.split("\\s")[1];
+    }
+
+    /**
+     * return second argument.
+     * @return
+     */
+    public int arg2() {
+        if (commandType().equals("C_PUSH") || commandType().equals("C_POP") || commandType().equals("C_FUNCTION")
+                || commandType().equals("C_CALL")) {
+            return Integer.parseInt(commandList.get(currentCommandNum).split("\\s")[2]);
+        }
+
+        throw new IllegalCallerException("Illegal call");
+    }
 }
