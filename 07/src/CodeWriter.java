@@ -224,4 +224,7 @@ public class CodeWriter {
                 "(CONTINUE" + arthJump + ")\n";
     }
 
+    public void close() {
+        writeOut.close();;
+    }
 }

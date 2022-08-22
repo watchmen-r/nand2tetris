@@ -12,6 +12,16 @@ public class Parser {
     private List<String> commandList = new ArrayList<>();
     private int currentCommandNum;
 
+    public static final String C_ARITHMEETIC = "C_ARITHMEETIC";
+    public static final String C_PUSH = "C_PUSH";
+    public static final String C_POP = "C_POP";
+    public static final String C_LABEL = "C_LABEL";
+    public static final String C_GOTO = "C_GOTO";
+    public static final String C_IF = "C_IF";
+    public static final String C_FUNCTION = "C_FUNCTION";
+    public static final String C_RETURN = "C_RETURN";
+    public static final String C_CALL = "C_CALL";
+
     private static final List<String> arithmeticCmds = new ArrayList<>();
 
     static {
@@ -85,39 +95,39 @@ public class Parser {
         String[] cmds = crrCmd.split("\\s");
 
         if (arithmeticCmds.contains(cmds[0])) {
-            return "C_ARITHMEETIC";
+            return C_ARITHMEETIC;
         }
 
         if (cmds[0].equals("push")) {
-            return "C_PUSH";
+            return C_PUSH;
         }
 
         if (cmds[0].equals("pop")) {
-            return "C_POP";
+            return C_POP;
         }
 
         if (cmds[0].equals("label")) {
-            return "C_LABEL";
+            return C_LABEL;
         }
 
         if (cmds[0].equals("goto")) {
-            return "C_GOTO";
+            return C_GOTO;
         }
 
         if (cmds[0].equals("if")) {
-            return "C_IF";
+            return C_IF;
         }
 
         if (cmds[0].equals("function")) {
-            return "C_FUNCTION";
+            return C_FUNCTION;
         }
 
         if (cmds[0].equals("return")) {
-            return "C_RETURN";
+            return C_RETURN;
         }
 
         if (cmds[0].equals("call")) {
-            return "C_CALL";
+            return C_CALL;
         }
 
         throw new IllegalArgumentException("Unknown command.");
@@ -131,11 +141,11 @@ public class Parser {
     public String arg1() {
         String currentCmd = commandList.get(currentCommandNum);
 
-        if (commandType().equals("C_RETURN")) {
+        if (commandType().equals(C_RETURN)) {
             throw new IllegalCallerException("Illegal call");
         }
 
-        if (commandType().equals("C_ARITHMEETIC")) {
+        if (commandType().equals(C_ARITHMEETIC)) {
             return currentCmd;
         }
 
@@ -147,8 +157,8 @@ public class Parser {
      * @return
      */
     public int arg2() {
-        if (commandType().equals("C_PUSH") || commandType().equals("C_POP") || commandType().equals("C_FUNCTION")
-                || commandType().equals("C_CALL")) {
+        if (commandType().equals(C_PUSH) || commandType().equals(C_POP) || commandType().equals(C_FUNCTION)
+                || commandType().equals(C_CALL)) {
             return Integer.parseInt(commandList.get(currentCommandNum).split("\\s")[2]);
         }
 
