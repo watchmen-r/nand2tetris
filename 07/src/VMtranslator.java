@@ -13,8 +13,9 @@ public class VMtranslator {
         if (source.isDirectory()) {
             File[] files = source.listFiles();
             Arrays.stream(files).forEach(file -> translateVm(file));
+        } else {
+            translateVm(source);
         }
-
     }
 
     private static void translateVm(File source) {
@@ -27,7 +28,7 @@ public class VMtranslator {
 
         try {
             Parser parser = new Parser(source);
-            File outputFile = new File(source.getParent(), inputFileName + ".hack");
+            File outputFile = new File(source.getParent(), inputFileName + ".asm");
             CodeWriter writer = new CodeWriter(outputFile);
             while (parser.hasMoreCommands()) {
                 parseLine(parser, writer);

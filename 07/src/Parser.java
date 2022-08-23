@@ -50,20 +50,14 @@ public class Parser {
     }
 
     private void addCommand(String line) {
-        String[] words = line.trim().split("\\s");
+        String words = line.trim();
 
-        // parse per one word.
-        StringBuilder command = new StringBuilder();
-        for (String word : words) {
-            // ignore comment
-            if (word.length() >= 2 && word.substring(0, 2).equals("//")) {
-                break;
-            }
-            command.append(word);
+        if (words.length() >= 2 && words.substring(0, 2).equals("//")) {
+            return;
         }
 
-        if (!command.isEmpty()) {
-            commandList.add(command.toString());
+        if(!words.isEmpty()) {
+            commandList.add(words);
         }
     }
 
@@ -93,7 +87,7 @@ public class Parser {
     public String commandType() {
         String crrCmd = commandList.get(currentCommandNum);
         String[] cmds = crrCmd.split("\\s");
-
+        
         if (arithmeticCmds.contains(cmds[0])) {
             return C_ARITHMEETIC;
         }
