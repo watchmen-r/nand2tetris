@@ -61,7 +61,7 @@ public class CodeWriter {
             return;
         }
 
-        throw new IllegalCallerException("invalid call method");
+        throw new IllegalCallerException("invalid call method : " + command + " :");
     }
 
     public void writePushPop(String command, String segment, int index) {

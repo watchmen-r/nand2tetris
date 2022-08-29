@@ -56,8 +56,13 @@ public class Parser {
             return;
         }
 
+        int commentSlash = words.indexOf("//");
+        if(commentSlash != -1) {
+            words = words.substring(0, commentSlash);
+        }
+
         if(!words.isEmpty()) {
-            commandList.add(words);
+            commandList.add(words.trim());
         }
     }
 
@@ -108,7 +113,7 @@ public class Parser {
             return C_GOTO;
         }
 
-        if (cmds[0].equals("if")) {
+        if (cmds[0].equals("if-goto")) {
             return C_IF;
         }
 
