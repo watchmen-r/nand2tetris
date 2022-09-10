@@ -22,12 +22,12 @@ public class JackTokenizer {
     private static final String IDENTIFIER_REGEX = "[\\w_]+";
 
     private static final String KEYWORD = "KEYWORD";
-    private static final String SYMBOL = "SYMBOL";
+    static final String SYMBOL = "SYMBOL";
     private static final String IDENTIFIER = "IDENTIFIER";
     private static final String INT_CONST = "INT_CONST";
     private static final String STRING_CONST = "STRING_CONST";
 
-    private static Map<String, String> keyWordMap = new HashMap<>();
+    public static Map<String, String> keyWordMap = new HashMap<>();
 
     static {
         keyWordMap.put("class", "CLASS");
@@ -98,6 +98,10 @@ public class JackTokenizer {
         if(hasMoreTokens()) {
             pointer++;
         }
+    }
+
+    public void pointerBack() {
+        pointer--;
     }
 
     public String tokenType() {
