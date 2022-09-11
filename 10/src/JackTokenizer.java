@@ -21,11 +21,11 @@ public class JackTokenizer {
     private static final String STR_REGEX = "\"[^\"]*\"";
     private static final String IDENTIFIER_REGEX = "[\\w_]+";
 
-    private static final String KEYWORD = "KEYWORD";
-    static final String SYMBOL = "SYMBOL";
-    private static final String IDENTIFIER = "IDENTIFIER";
-    private static final String INT_CONST = "INT_CONST";
-    private static final String STRING_CONST = "STRING_CONST";
+    public static final String KEYWORD = "KEYWORD";
+    public static final String SYMBOL = "SYMBOL";
+    public static final String IDENTIFIER = "IDENTIFIER";
+    public static final String INT_CONST = "INT_CONST";
+    public static final String STRING_CONST = "STRING_CONST";
 
     public static Map<String, String> keyWordMap = new HashMap<>();
 
@@ -166,6 +166,10 @@ public class JackTokenizer {
         String currentToken = tokens.get(pointer);
         // to remove double quote, use substring
         return currentToken.substring(1, currentToken.length() - 1);
+    }
+
+    public String getToken() {
+        return tokens.get(pointer);
     }
 
 }

@@ -41,10 +41,51 @@ public class CompliationEngine {
 
         if (tokenizer.keyWord().equals(JackTokenizer.keyWordMap.get("constructor"))
                 || tokenizer.keyWord().equals(JackTokenizer.keyWordMap.get("function"))
-                || tokenizer.keyWord().equals(JackTokenizer.keyWordMap.get("method")) {
+                || tokenizer.keyWord().equals(JackTokenizer.keyWordMap.get("method"))) {
             tokenizer.pointerBack();
             return;
         }
+
+        // classVarDec starts 'static' or 'field'
+        if (!tokenizer.keyWord().equals(JackTokenizer.keyWordMap.get("static")) && tokenizer.keyWord().equals(JackTokenizer.keyWordMap.get("field"))) {
+            throw new Error("invalid source code.");
+        }
+
+        outputWriter.print("<classVarDec>\n");
+        outputWriter.print("<keyword>" + tokenizer.getToken() + "</keyword>\n");
+        tokenPrintWriter.print("<keyword>" + tokenizer.getToken() + "</keyword>\n");
+
+        // next is Type, according to book P233.
+        compileType();
+
+        for(;;) {
+            tokenizer.advance();
+            if (tokenizer.tokenType() != JackTokenizer.IDENTIFIER) {
+                throw new Error("invalid source code.");
+            }
+            outputWriter.print("<identifier>" + tokenizer.identifier() + "</identifier>\n");
+            tokenPrintWriter.print("<identifier>" + tokenizer.identifier() + "</identifier>\n");
+
+            tokenizer.advance();
+
+            
+
+            if (tokenizer.symbol() == ',') {
+                outputWriter.print("<symbol>,</symbol>\n");
+                tokenPrintWriter.print("<symbol>,</symbol>\n");
+            } else if (tokenizer.symbol() == ';') {
+                outputWriter.print("<symbol>;</symbol>\n");
+                tokenPrintWriter.print("<symbol>;</symbol>\n");
+                break;
+            } else {
+                throw new Error("invalid source code.");
+            }
+        }
+        outputWriter.print("</classVarDec>\n");
+        compileClassVarDec();
+    }
+
+    public void compileType() {
 
     }
 
