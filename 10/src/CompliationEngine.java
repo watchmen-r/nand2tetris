@@ -68,8 +68,6 @@ public class CompliationEngine {
 
             tokenizer.advance();
 
-            
-
             if (tokenizer.symbol() == ',') {
                 outputWriter.print("<symbol>,</symbol>\n");
                 tokenPrintWriter.print("<symbol>,</symbol>\n");
@@ -86,7 +84,23 @@ public class CompliationEngine {
     }
 
     public void compileType() {
+        tokenizer.advance();
 
+        // In case token is 'int' or 'char' or 'boolena'
+        if (tokenizer.tokenType() == JackTokenizer.KEYWORD 
+            && (tokenizer.keyWord().equals(JackTokenizer.keyWordMap.get("int"))
+            || tokenizer.keyWord().equals(JackTokenizer.keyWordMap.get("char"))
+            || tokenizer.keyWord().equals(JackTokenizer.keyWordMap.get("boolean")))) {
+            outputWriter.print("<keyword>" + tokenizer.getToken() + "</keyword>\n");
+            tokenPrintWriter.print("<keyword>" + tokenizer.getToken() + "</keyword>\n");
+                
+            // In case token is className(className is identifier)
+        } else if (tokenizer.tokenType() == JackTokenizer.IDENTIFIER) {
+            outputWriter.print("<keyword>" + tokenizer.getToken() + "</keyword>\n");
+            tokenPrintWriter.print("<keyword>" + tokenizer.getToken() + "</keyword>\n");
+        } else {
+            throw new Error("invalid source code. Check type.");
+        }
     }
 
     private void nextSymbol(char symbol) {
