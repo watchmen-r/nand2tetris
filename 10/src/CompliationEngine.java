@@ -109,7 +109,8 @@ public class CompliationEngine {
 
         tokenizer.advance();
         // check next token is void or type
-        if (tokenizer.tokenType().equals(JackTokenizer.KEYWORD) && tokenizer.keyWord().equals(JackTokenizer.keyWordMap.get("void"))) {
+        if (tokenizer.tokenType().equals(JackTokenizer.KEYWORD)
+                && tokenizer.keyWord().equals(JackTokenizer.keyWordMap.get("void"))) {
             outputWriter.print("<keyword>void</keyword>\n");
             tokenPrintWriter.print("<keyword>void</keyword>\n");
         } else {
@@ -133,14 +134,16 @@ public class CompliationEngine {
         compileParameterList();
         outputWriter.print("</parameterList>\n");
 
-        // TODO prior to implement compileParameterList
+        nextSymbol(')');
+
+        compileSubroutineBody();
     }
 
     public void compileType() {
         tokenizer.advance();
 
         // In case token is 'int' or 'char' or 'boolena'
-        if (tokenizer.tokenType() == JackTokenizer.KEYWORD
+        if (tokenizer.tokenType().equals(JackTokenizer.KEYWORD)
                 && (tokenizer.keyWord().equals(JackTokenizer.keyWordMap.get("int"))
                         || tokenizer.keyWord().equals(JackTokenizer.keyWordMap.get("char"))
                         || tokenizer.keyWord().equals(JackTokenizer.keyWordMap.get("boolean")))) {
@@ -155,11 +158,106 @@ public class CompliationEngine {
             throw new Error("invalid source code. Check type.");
         }
     }
-    
 
-    // TODO implementation
+    public void compileSubroutineBody() {
+        outputWriter.print("<subroutineBody>\n");
+        nextSymbol('{');
+
+        // next is varDec
+        compileVarDec();
+
+        // next is statement
+        outputWriter.print("<statements>\n");
+        compileStatement();
+        outputWriter.print("</statements>\n");
+
+        nextSymbol('}');
+        outputWriter.print("</subroutineBody>\n");
+    }
+
+    public void compileStatement() {
+        // TODO implement
+    }
+
     public void compileParameterList() {
+        tokenizer.advance();
 
+        if (tokenizer.tokenType() == JackTokenizer.SYMBOL && tokenizer.symbol() == ')') {
+            tokenizer.pointerBack();
+            return;
+        }
+
+        tokenizer.pointerBack();
+        for (;;) {
+            // at first. there is a type.
+            compileType();
+
+            // next is varName which is identifier.
+            tokenizer.advance();
+            if (!tokenizer.tokenType().equals(JackTokenizer.IDENTIFIER)) {
+                throw new Error("invalid source code. Next token has to be identifier of subroutineName.");
+            }
+            outputWriter.print("<identifier>" + tokenizer.identifier() + "</identifier>\n");
+            tokenPrintWriter.print("<identifier>" + tokenizer.identifier() + "</identifier>\n");
+
+            // next is '.' or ')'
+            tokenizer.advance();
+            if (!tokenizer.tokenType().equals(JackTokenizer.SYMBOL)
+                    || (tokenizer.symbol() != ',' && tokenizer.symbol() != ')')) {
+                throw new Error("invalid source code. Next token has to be identifier of subroutineName.");
+            }
+
+            if (tokenizer.symbol() == ',') {
+                outputWriter.print("<symbol>,</symbol>\n");
+                tokenPrintWriter.print("<symbol>,</symbol>\n");
+            } else {
+                tokenizer.pointerBack();
+                break;
+            }
+        }
+    }
+
+    private void compileVarDec() {
+        tokenizer.advance();
+
+        if (tokenizer.tokenType() == JackTokenizer.KEYWORD
+                || !tokenizer.keyWord().equals(JackTokenizer.keyWordMap.get("var"))) {
+            tokenizer.pointerBack();
+            return;
+        }
+
+        outputWriter.print("<varDec>\n");
+        outputWriter.print("<keyword>var</keyword>\n");
+        tokenPrintWriter.print("<keyword>var</keyword>\n");
+
+        // next token is type
+        compileType();
+
+        for(;;) {
+            // next token is varName which is identifier
+            tokenizer.advance();
+            if (!tokenizer.tokenType().equals(JackTokenizer.IDENTIFIER)) {
+                throw new Error("invalid source code. Next token has to be identifier of compileVarDec.");
+            }
+            outputWriter.print("<identifier>" + tokenizer.identifier() + "</identifier>\n");
+            tokenPrintWriter.print("<identifier>" + tokenizer.identifier() + "</identifier>\n");
+
+            // next is ',' or ';'
+            tokenizer.advance();
+            if (!tokenizer.tokenType().equals(JackTokenizer.SYMBOL)
+                    || (tokenizer.symbol() != ',' && tokenizer.symbol() != ';')) {
+                throw new Error("invalid source code. Next token has to be identifier of subroutineName.");
+            }
+
+            if (tokenizer.symbol() == ',') {
+                outputWriter.print("<symbol>,</symbol>\n");
+                tokenPrintWriter.print("<symbol>,</symbol>\n");
+            } else {
+                outputWriter.print("<symbol>;</symbol>\n");
+                tokenPrintWriter.print("<symbol>;</symbol>\n");
+                break;
+            }
+        }
     }
 
     private void nextSymbol(char symbol) {
