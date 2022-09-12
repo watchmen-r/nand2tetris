@@ -164,8 +164,19 @@ public class CompliationEngine {
         nextSymbol('{');
 
         // next is varDec
-        // TODO implement below first
         compileVarDec();
+
+        // next is statement
+        outputWriter.print("<statements>\n");
+        compileStatement();
+        outputWriter.print("</statements>\n");
+
+        nextSymbol('}');
+        outputWriter.print("</subroutineBody>\n");
+    }
+
+    public void compileStatement() {
+        // TODO implement
     }
 
     public void compileParameterList() {
