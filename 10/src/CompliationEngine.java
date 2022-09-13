@@ -37,8 +37,7 @@ public class CompliationEngine {
     public void compileClassVarDec() {
         tokenizer.advance();
 
-        if (tokenizer.tokenType() == JackTokenizer.SYMBOL && tokenizer.symbol() == '}') {
-            tokenizer.pointerBack();
+        if (symbolPointerBack('}')) {
             return;
         }
 
@@ -90,8 +89,7 @@ public class CompliationEngine {
     public void compileSubroutine() {
         tokenizer.advance();
 
-        if (tokenizer.tokenType() == JackTokenizer.SYMBOL && tokenizer.symbol() == '}') {
-            tokenizer.pointerBack();
+        if (symbolPointerBack('}')) {
             return;
         }
 
@@ -176,14 +174,33 @@ public class CompliationEngine {
     }
 
     public void compileStatement() {
-        // TODO implement
+        tokenizer.advance();
+
+        if (symbolPointerBack('}')) {
+            return;
+        }
+
+        String statement = tokenizer.keyWord();
+
+        if (statement.equals(JackTokenizer.keyWordMap.get("let"))) {
+            complieStatementLet();
+        } else if (statement.equals(JackTokenizer.keyWordMap.get("if"))) {
+            compileStatementIf();
+        } else if (statement.equals(JackTokenizer.keyWordMap.get("while"))) {
+            compileStatementWhile();
+        } else if (statement.equals(JackTokenizer.keyWordMap.get("do"))) {
+            compileStatementDo();
+        } else if (statement.equals(JackTokenizer.keyWordMap.get("do"))) {
+            compileStatementReturn();
+        }
+
+        compileStatement();
     }
 
     public void compileParameterList() {
         tokenizer.advance();
 
-        if (tokenizer.tokenType() == JackTokenizer.SYMBOL && tokenizer.symbol() == ')') {
-            tokenizer.pointerBack();
+        if (symbolPointerBack(')')) {
             return;
         }
 
@@ -233,7 +250,7 @@ public class CompliationEngine {
         // next token is type
         compileType();
 
-        for(;;) {
+        for (;;) {
             // next token is varName which is identifier
             tokenizer.advance();
             if (!tokenizer.tokenType().equals(JackTokenizer.IDENTIFIER)) {
@@ -258,6 +275,14 @@ public class CompliationEngine {
                 break;
             }
         }
+    }
+
+    private boolean symbolPointerBack(char symbol) {
+        if (tokenizer.tokenType() == JackTokenizer.SYMBOL && tokenizer.symbol() == ')') {
+            tokenizer.pointerBack();
+            return true;
+        }
+        return false;
     }
 
     private void nextSymbol(char symbol) {
