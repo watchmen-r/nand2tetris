@@ -197,6 +197,52 @@ public class CompliationEngine {
         compileStatement();
     }
 
+    public void compileStatementLet() {
+        outputWriter.print("<letStatement>\n");
+        outputWriter.print("<keyword>let</keyword>\n");
+        tokenPrintWriter.print("<keyword>let</keyword>\n");
+
+        // next token is varName
+        tokenizer.advance();
+        outputWriter.print("<identifier>" + tokenizer.identifier() + "</identifier>\n");
+        tokenPrintWriter.print("<identifier>" + tokenizer.identifier() + "</identifier>\n");
+
+        // next token is '(' or '['
+        tokenizer.advance();
+
+        // next token is '['expression']'
+        if (tokenizer.symbol() == '[') {
+            outputWriter.print("<symbol>[</symbol>\n");
+            tokenPrintWriter.print("<symbol>[</symbol>\n");
+
+            compileExpression();
+
+            // next token is ']'
+            tokenizer.advance();
+            outputWriter.print("<symbol>]</symbol>\n");
+            tokenPrintWriter.print("<symbol>]</symbol>\n");
+
+            tokenizer.advance();
+        }
+
+        // next token is '='
+        outputWriter.print("<symbol>=</symbol>\n");
+        tokenPrintWriter.print("<symbol>=</symbol>\n");
+
+        // next token is expression
+        compileExpression();
+
+        // next token is ';'
+        outputWriter.print("<symbol>;</symbol>\n");
+        tokenPrintWriter.print("<symbol>;</symbol>\n");
+
+        outputWriter.print("</letStatement>\n");
+    }
+
+    public void compileExpression() {
+
+    }
+ 
     public void compileParameterList() {
         tokenizer.advance();
 
