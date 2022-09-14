@@ -240,9 +240,81 @@ public class CompliationEngine {
     }
 
     public void compileExpression() {
+        outputWriter.print("<expression>\n");
 
+        // TODO first implement compileTerm
+        compileTerm()
     }
- 
+
+    public void compileTerm() {
+        outputWriter.print("<term>\n");
+
+        tokenizer.advance();
+
+        if (tokenizer.tokenType().equals(JackTokenizer.IDENTIFIER)) {
+            String identifier = tokenizer.identifier();
+            tokenizer.advance();
+            // when next is subroutineCall
+            if (tokenizer.tokenType().equals(JackTokenizer.SYMBOL)
+                    && (tokenizer.symbol() == '(' || tokenizer.symbol() == '.')) {
+                tokenizer.pointerBack();
+                tokenizer.pointerBack();
+                compileSubroutineCall();
+
+                // this is array
+            } else if (tokenizer.tokenType().equals(JackTokenizer.SYMBOL) && tokenizer.symbol() == '[') {
+                outputWriter.print("<identifier>" + identifier + "</identifier>\n");
+                tokenPrintWriter.print("<identifier>" + identifier + "</identifier>\n");
+                tokenizer.pointerBack();
+                nextSymbol('[');
+                compileExpression();
+                nextSymbol(']');
+            } else {
+                outputWriter.print("<identifier>" + identifier + "</identifier>\n");
+                tokenPrintWriter.print("<identifier>" + identifier + "</identifier>\n");
+                tokenizer.pointerBack();
+            }
+        } else {
+            // integerConstant
+            if (tokenizer.tokenType().equals(JackTokenizer.INT_CONST)) {
+                outputWriter.print("<integerConstant>" + tokenizer.intVal() + "</integerConstant>\n");
+                tokenPrintWriter.print("<integerConstant>" + tokenizer.intVal() + "</integerConstant>\n");
+            }
+
+            // stringConstant
+            if (tokenizer.tokenType().equals(JackTokenizer.STRING_CONST)) {
+                outputWriter.print("<stringConstant>" + tokenizer.stringVal() + "</stringConstant>\n");
+                tokenPrintWriter.print("<stringConstant>" + tokenizer.stringVal() + "</stringConstant>\n");
+            }
+
+            // KeywordConstant
+            if (tokenizer.tokenType().equals(JackTokenizer.KEYWORD) &&
+                    (tokenizer.keyWord().equals(JackTokenizer.keyWordMap.get("true")) ||
+                            tokenizer.keyWord().equals(JackTokenizer.keyWordMap.get("false")) ||
+                            tokenizer.keyWord().equals(JackTokenizer.keyWordMap.get("null")) ||
+                            tokenizer.keyWord().equals(JackTokenizer.keyWordMap.get("this")))) {
+                outputWriter.print("<keyword>" + tokenizer.stringVal() + "</keyword>\n");
+                tokenPrintWriter.print("<keyword>" + tokenizer.stringVal() + "</keyword>\n");
+            }
+
+            // (expression)
+            if (tokenizer.tokenType().equals(JackTokenizer.SYMBOL) && tokenizer.symbol() == '(') {
+                outputWriter.print("<symbol>(</symbol>\n");
+                tokenPrintWriter.print("<symbol>(</symbol>\n");
+                compileExpression();
+                nextSymbol(')');
+            }
+
+            if (tokenizer.tokenType().equals(JackTokenizer.SYMBOL)
+                    && (tokenizer.symbol() == '-' || tokenizer.symbol() == '~')) {
+                outputWriter.print("<symbol>" + tokenizer.symbol() + "</symbol>\n");
+                tokenPrintWriter.print("<symbol>" + tokenizer.symbol() + "</symbol>\n");
+                compileTerm();
+            }
+        }
+        outputWriter.print("</term>\n");
+    }
+
     public void compileParameterList() {
         tokenizer.advance();
 
