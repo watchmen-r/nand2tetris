@@ -4,8 +4,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -28,6 +30,7 @@ public class JackTokenizer {
     public static final String STRING_CONST = "STRING_CONST";
 
     public static Map<String, String> keyWordMap = new HashMap<>();
+    public static Set<Character> opSet = new HashSet<>();
 
     static {
         keyWordMap.put("class", "CLASS");
@@ -51,6 +54,16 @@ public class JackTokenizer {
         keyWordMap.put("false", "FALSE");
         keyWordMap.put("null", "NULL");
         keyWordMap.put("this", "THIS");
+
+        opSet.add('+');
+        opSet.add('-');
+        opSet.add('*');
+        opSet.add('/');
+        opSet.add('&');
+        opSet.add('|');
+        opSet.add('<');
+        opSet.add('>');
+        opSet.add('=');
     }
 
     public JackTokenizer(File source) throws IOException {
@@ -69,7 +82,7 @@ public class JackTokenizer {
         Pattern tokenPattern = Pattern.compile(
                 KEYWORD_REGEX + "|" + SYMBOL_REGEX + "|" + INTEGER_REGEX + "|" + STR_REGEX + "|" + IDENTIFIER_REGEX);
         Matcher m = tokenPattern.matcher(code);
-        while(m.find()) {
+        while (m.find()) {
             tokens.add(m.group());
         }
 
@@ -95,7 +108,7 @@ public class JackTokenizer {
     }
 
     public void advance() {
-        if(hasMoreTokens()) {
+        if (hasMoreTokens()) {
             pointer++;
         }
     }
@@ -106,23 +119,23 @@ public class JackTokenizer {
 
     public String tokenType() {
         String currentToken = tokens.get(pointer);
-        if(currentToken.matches(KEYWORD_REGEX)) {
+        if (currentToken.matches(KEYWORD_REGEX)) {
             return KEYWORD;
         }
 
-        if(currentToken.matches(SYMBOL_REGEX)) {
+        if (currentToken.matches(SYMBOL_REGEX)) {
             return SYMBOL;
         }
 
-        if(currentToken.matches(IDENTIFIER_REGEX)) {
+        if (currentToken.matches(IDENTIFIER_REGEX)) {
             return IDENTIFIER;
         }
 
-        if(currentToken.matches(INTEGER_REGEX)) {
+        if (currentToken.matches(INTEGER_REGEX)) {
             return INT_CONST;
         }
 
-        if(currentToken.matches(STR_REGEX)) {
+        if (currentToken.matches(STR_REGEX)) {
             return STRING_CONST;
         }
 
@@ -172,4 +185,7 @@ public class JackTokenizer {
         return tokens.get(pointer);
     }
 
+    public boolean isOp() {
+        return opSet.contains(symbol());
+    }
 }
