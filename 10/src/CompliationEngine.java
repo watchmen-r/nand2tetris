@@ -243,7 +243,7 @@ public class CompliationEngine {
         outputWriter.print("<expression>\n");
 
         // TODO first implement compileTerm
-        compileTerm()
+        compileTerm();
     }
 
     public void compileTerm() {
@@ -313,6 +313,37 @@ public class CompliationEngine {
             }
         }
         outputWriter.print("</term>\n");
+    }
+
+    public void compileSubroutineCall() {
+        // next token is subroutineName or classname or varName
+        tokenizer.advance();
+        outputWriter.print("<identifier>" + tokenizer.identifier() + "</identifier>\n");
+        tokenPrintWriter.print("<identifier>" + tokenizer.identifier() + "</identifier>\n");
+
+        tokenizer.advance();
+        if (tokenizer.tokenType().equals(JackTokenizer.SYMBOL) && tokenizer.symbol() == '(') {
+            outputWriter.print("<symbol>(</symbol>\n");
+            tokenPrintWriter.print("<symbol>(</symbol>\n");
+            outputWriter.print("<expressionList>\n");
+            compileExpressionList();
+            outputWriter.print("</expressionList>\n");
+            nextSymbol(')');
+        } else if (tokenizer.tokenType().equals(JackTokenizer.SYMBOL) && tokenizer.symbol() == '.') {
+            outputWriter.print("<symbol>.</symbol>\n");
+            tokenPrintWriter.print("<symbol>.</symbol>\n");
+
+            // next token is subroutineName
+            tokenizer.advance();
+            outputWriter.print("<identifier>" + tokenizer.identifier() + "</identifier>\n");
+            tokenPrintWriter.print("<identifier>" + tokenizer.identifier() + "</identifier>\n");
+
+            nextSymbol('(');
+            outputWriter.print("<expressionList>\n");
+            compileExpressionList();
+            outputWriter.print("</expressionList>\n");
+            nextSymbol(')');
+        }
     }
 
     public void compileParameterList() {
