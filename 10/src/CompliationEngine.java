@@ -346,6 +346,28 @@ public class CompliationEngine {
         }
     }
 
+    public void compileExpressionList() {
+        tokenizer.advance();
+        if (tokenizer.tokenType().equals(JackTokenizer.SYMBOL) && tokenizer.symbol() == ')') {
+            tokenizer.pointerBack();
+        } else {
+            tokenizer.pointerBack();
+            compileExpression();
+            for(;;) {
+                tokenizer.advance();
+                if (tokenizer.tokenType().equals(JackTokenizer.SYMBOL) && tokenizer.symbol() == ','){
+                    outputWriter.print("<symbol>,</symbol>\n");
+                    tokenPrintWriter.print("<symbol>,</symbol>\n");
+                    compileExpression();
+                }else {
+                    tokenizer.pointerBack();
+                    break;
+                }
+            }
+        }
+
+    }
+
     public void compileParameterList() {
         tokenizer.advance();
 
