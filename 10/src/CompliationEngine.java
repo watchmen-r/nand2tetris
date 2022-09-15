@@ -183,7 +183,7 @@ public class CompliationEngine {
         String statement = tokenizer.keyWord();
 
         if (statement.equals(JackTokenizer.keyWordMap.get("let"))) {
-            complieStatementLet();
+            compileStatementLet();
         } else if (statement.equals(JackTokenizer.keyWordMap.get("if"))) {
             compileStatementIf();
         } else if (statement.equals(JackTokenizer.keyWordMap.get("while"))) {
@@ -195,6 +195,36 @@ public class CompliationEngine {
         }
 
         compileStatement();
+    }
+
+    public void compileStatementIf() {
+        outputWriter.print("<ifStatement>\n");
+        outputWriter.print("<keyword>if</keyword>\n");
+        tokenPrintWriter.print("<keyword>if</keyword>\n");
+        nextSymbol('(');
+        compileExpression();
+        nextSymbol(')');
+
+        nextSymbol('{');
+        outputWriter.print("<statements>\n");
+        compileStatement();
+        outputWriter.print("</statements>\n")
+        nextSymbol('}');
+
+        // next token would be else
+        tokenizer.advance();
+        if (tokenizer.tokenType().equals(JackTokenizer.KEYWORD) && JackTokenizer.keyWordMap.get("else").equals(tokenizer.keyWord())) {
+            outputWriter.print("<keyword>else</keyword>\n");
+            tokenPrintWriter.print("<keyword>else</keyword>\n");
+            nextSymbol('{');
+            outputWriter.print("<statements>\n");
+            compileStatement();
+            outputWriter.print("</statements>\n");
+            nextSymbol('}');
+        } else {
+            tokenizer.pointerBack();
+        }
+        outputWriter.print("</ifStatement>\n");
     }
 
     public void compileStatementLet() {
