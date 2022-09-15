@@ -241,9 +241,30 @@ public class CompliationEngine {
 
     public void compileExpression() {
         outputWriter.print("<expression>\n");
-
-        // TODO first implement compileTerm
         compileTerm();
+        for(;;) {
+            tokenizer.advance();
+            if(tokenizer.tokenType().equals(JackTokenizer.SYMBOL) && tokenizer.isOp()) {
+                if (tokenizer.symbol() == '>'){
+                    outputWriter.print("<symbol>&gt;</symbol>\n");
+                    tokenPrintWriter.print("<symbol>&gt;</symbol>\n");
+                }else if (tokenizer.symbol() == '<'){
+                    outputWriter.print("<symbol>&lt;</symbol>\n");
+                    tokenPrintWriter.print("<symbol>&lt;</symbol>\n");
+                }else if (tokenizer.symbol() == '&') {
+                    outputWriter.print("<symbol>&amp;</symbol>\n");
+                    tokenPrintWriter.print("<symbol>&amp;</symbol>\n");
+                }else {
+                    outputWriter.print("<symbol>" + tokenizer.symbol() + "</symbol>\n");
+                    tokenPrintWriter.print("<symbol>" + tokenizer.symbol() + "</symbol>\n");
+                }
+                //term
+                compileTerm();
+            } else {
+                tokenizer.pointerBack();
+                break;
+            }
+        } 
     }
 
     public void compileTerm() {
