@@ -197,6 +197,50 @@ public class CompliationEngine {
         compileStatement();
     }
 
+    public void compileStatementReturn() {
+        outputWriter.print("<returnStatement>\n");
+        outputWriter.print("<keyword>return</keyword>\n");
+        tokenPrintWriter.print("<keyword>return</keyword>\n");
+
+        tokenizer.advance();
+        if (tokenizer.tokenType().equals(JackTokenizer.SYMBOL) && tokenizer.symbol() == ';') {
+            outputWriter.print("<symbol>;</symbol>\n");
+            tokenPrintWriter.print("<symbol>;</symbol>\n");
+            outputWriter.print("</returnStatement>\n");
+            return;
+        }
+        tokenizer.pointerBack();
+        compileExpression();
+        nextSymbol(';');
+        outputWriter.print("</returnStatement>\n");
+    }
+
+    public void compileStatementDo() {
+        outputWriter.print("<doStatement>\n");
+        outputWriter.print("<keyword>do</keyword>\n");
+        tokenPrintWriter.print("<keyword>do</keyword>\n");
+
+        compileSubroutine();
+        nextSymbol(';');
+        outputWriter.print("</doStatement>\n");
+    }
+
+    public void compileStatementWhile() {
+        outputWriter.print("<whileStatement>\n");
+        outputWriter.print("<keyword>while</keyword>\n");
+        tokenPrintWriter.print("<keyword>while</keyword>\n");
+
+        nextSymbol('(');
+        compileExpression();
+        nextSymbol(')');
+        nextSymbol('{');
+        outputWriter.print("<statement>\n");
+        compileStatement();
+        outputWriter.print("</statement>\n");
+        nextSymbol('}');
+        outputWriter.print("</whileStatement>\n");
+    }
+
     public void compileStatementIf() {
         outputWriter.print("<ifStatement>\n");
         outputWriter.print("<keyword>if</keyword>\n");
@@ -208,7 +252,7 @@ public class CompliationEngine {
         nextSymbol('{');
         outputWriter.print("<statements>\n");
         compileStatement();
-        outputWriter.print("</statements>\n")
+        outputWriter.print("</statements>\n");
         nextSymbol('}');
 
         // next token would be else
@@ -272,29 +316,29 @@ public class CompliationEngine {
     public void compileExpression() {
         outputWriter.print("<expression>\n");
         compileTerm();
-        for(;;) {
+        for (;;) {
             tokenizer.advance();
-            if(tokenizer.tokenType().equals(JackTokenizer.SYMBOL) && tokenizer.isOp()) {
-                if (tokenizer.symbol() == '>'){
+            if (tokenizer.tokenType().equals(JackTokenizer.SYMBOL) && tokenizer.isOp()) {
+                if (tokenizer.symbol() == '>') {
                     outputWriter.print("<symbol>&gt;</symbol>\n");
                     tokenPrintWriter.print("<symbol>&gt;</symbol>\n");
-                }else if (tokenizer.symbol() == '<'){
+                } else if (tokenizer.symbol() == '<') {
                     outputWriter.print("<symbol>&lt;</symbol>\n");
                     tokenPrintWriter.print("<symbol>&lt;</symbol>\n");
-                }else if (tokenizer.symbol() == '&') {
+                } else if (tokenizer.symbol() == '&') {
                     outputWriter.print("<symbol>&amp;</symbol>\n");
                     tokenPrintWriter.print("<symbol>&amp;</symbol>\n");
-                }else {
+                } else {
                     outputWriter.print("<symbol>" + tokenizer.symbol() + "</symbol>\n");
                     tokenPrintWriter.print("<symbol>" + tokenizer.symbol() + "</symbol>\n");
                 }
-                //term
+                // term
                 compileTerm();
             } else {
                 tokenizer.pointerBack();
                 break;
             }
-        } 
+        }
     }
 
     public void compileTerm() {
@@ -404,13 +448,13 @@ public class CompliationEngine {
         } else {
             tokenizer.pointerBack();
             compileExpression();
-            for(;;) {
+            for (;;) {
                 tokenizer.advance();
-                if (tokenizer.tokenType().equals(JackTokenizer.SYMBOL) && tokenizer.symbol() == ','){
+                if (tokenizer.tokenType().equals(JackTokenizer.SYMBOL) && tokenizer.symbol() == ',') {
                     outputWriter.print("<symbol>,</symbol>\n");
                     tokenPrintWriter.print("<symbol>,</symbol>\n");
                     compileExpression();
-                }else {
+                } else {
                     tokenizer.pointerBack();
                     break;
                 }
