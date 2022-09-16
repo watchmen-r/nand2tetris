@@ -13,11 +13,10 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 public class JackTokenizer {
-    private File inputFile;
     List<String> tokens;
     int pointer;
 
-    private static final String KEYWORD_REGEX = "class | constructor | function | method | field | static | var | int | char | boolean | void | true | false | null  this | let | do | if | else | while | return";
+    private static final String KEYWORD_REGEX = "class|constructor|function|method|field|static|var|int|char|boolean|void|true|false|null|this|let|do|if|else|while|return";
     private static final String SYMBOL_REGEX = "[\\{\\}\\(\\)\\[\\]\\.\\,\\;\\+\\-\\*\\/\\$\\|\\<\\>\\=\\~]";
     private static final String INTEGER_REGEX = "[0-9]+";
     private static final String STR_REGEX = "\"[^\"]*\"";
@@ -67,7 +66,6 @@ public class JackTokenizer {
     }
 
     public JackTokenizer(File source) throws IOException {
-        inputFile = source;
         tokens = new ArrayList<>();
 
         Path path = Path.of(source.getPath());
@@ -86,7 +84,7 @@ public class JackTokenizer {
             tokens.add(m.group());
         }
 
-        pointer = 0;
+        pointer = -1;
     }
 
     private void addToken(String line, StringBuilder contentBuilder) {

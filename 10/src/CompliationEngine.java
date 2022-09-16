@@ -8,9 +8,10 @@ public class CompliationEngine {
     private PrintWriter tokenPrintWriter;
     private JackTokenizer tokenizer;
 
-    public CompliationEngine(File input, File output) throws IOException {
+    public CompliationEngine(File input, File output, File tokenOutput) throws IOException {
         tokenizer = new JackTokenizer(input);
         outputWriter = new PrintWriter(output);
+        tokenPrintWriter = new PrintWriter(tokenOutput);
     }
 
     public void compileClass() {
@@ -40,7 +41,8 @@ public class CompliationEngine {
         if (symbolPointerBack('}')) {
             return;
         }
-
+        System.out.println(tokenizer.getToken());
+        System.out.println(tokenizer.tokenType());
         if (!tokenizer.keyWord().equals(JackTokenizer.keyWordMap.get("constructor"))
                 || !tokenizer.keyWord().equals(JackTokenizer.keyWordMap.get("function"))
                 || !tokenizer.keyWord().equals(JackTokenizer.keyWordMap.get("method"))) {
