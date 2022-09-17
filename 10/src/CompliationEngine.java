@@ -33,6 +33,12 @@ public class CompliationEngine {
         compileClassVarDec();
         compileSubroutine();
 
+        nextSymbol('}');
+
+        tokenPrintWriter.print("</tokens>\n");
+        outputWriter.print("</class>\n");
+        outputWriter.close();
+        tokenPrintWriter.close();
     }
 
     public void compileClassVarDec() {
@@ -41,11 +47,10 @@ public class CompliationEngine {
         if (symbolPointerBack('}')) {
             return;
         }
-        System.out.println(tokenizer.getToken());
-        System.out.println(tokenizer.tokenType());
-        if (!tokenizer.keyWord().equals(JackTokenizer.keyWordMap.get("constructor"))
-                || !tokenizer.keyWord().equals(JackTokenizer.keyWordMap.get("function"))
-                || !tokenizer.keyWord().equals(JackTokenizer.keyWordMap.get("method"))) {
+
+        if (tokenizer.keyWord().equals(JackTokenizer.keyWordMap.get("constructor"))
+                || tokenizer.keyWord().equals(JackTokenizer.keyWordMap.get("function"))
+                || tokenizer.keyWord().equals(JackTokenizer.keyWordMap.get("method"))) {
             tokenizer.pointerBack();
             return;
         }
@@ -96,10 +101,10 @@ public class CompliationEngine {
         }
 
         // subroutineDec starts 'constructor' or 'functino' or 'method'
-        if (!tokenizer.keyWord().equals(JackTokenizer.keyWordMap.get("keyword"))
+        if (!tokenizer.tokenType().equals(JackTokenizer.KEYWORD)
                 || (!tokenizer.keyWord().equals(JackTokenizer.keyWordMap.get("constructor"))
-                        || !tokenizer.keyWord().equals(JackTokenizer.keyWordMap.get("function"))
-                        || !tokenizer.keyWord().equals(JackTokenizer.keyWordMap.get("method")))) {
+                        && !tokenizer.keyWord().equals(JackTokenizer.keyWordMap.get("function"))
+                        && !tokenizer.keyWord().equals(JackTokenizer.keyWordMap.get("method")))) {
             throw new Error("invalid source code.");
         }
 
@@ -467,7 +472,6 @@ public class CompliationEngine {
 
     public void compileParameterList() {
         tokenizer.advance();
-
         if (symbolPointerBack(')')) {
             return;
         }
@@ -487,8 +491,9 @@ public class CompliationEngine {
 
             // next is '.' or ')'
             tokenizer.advance();
+
             if (!tokenizer.tokenType().equals(JackTokenizer.SYMBOL)
-                    || (tokenizer.symbol() != ',' && tokenizer.symbol() != ')')) {
+                    && (tokenizer.symbol() != ',' && tokenizer.symbol() != ')')) {
                 throw new Error("invalid source code. Next token has to be identifier of subroutineName.");
             }
 
@@ -546,7 +551,7 @@ public class CompliationEngine {
     }
 
     private boolean symbolPointerBack(char symbol) {
-        if (tokenizer.tokenType() == JackTokenizer.SYMBOL && tokenizer.symbol() == ')') {
+        if (tokenizer.tokenType() == JackTokenizer.SYMBOL && tokenizer.symbol() == symbol) {
             tokenizer.pointerBack();
             return true;
         }
