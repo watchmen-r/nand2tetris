@@ -1,4 +1,5 @@
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,9 +22,15 @@ public class JackAnalyzer {
 
     private static void processFile(File file) {
         String filePath = file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf('.'));
-        String outputPath = filePath + ".xml";
-        String tokenOutputPath = filePath + "T.xml";
+        File outputFile = new File(filePath + ".xml");
+        File tokenOutput = new File(filePath + "T.xml");
         
+        try {
+            CompliationEngine compliationEngine = new CompliationEngine(file, outputFile, tokenOutput);
+            compliationEngine.compileClass();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     
